@@ -42,11 +42,10 @@ Article.loadAll = function(dataWePassIn) {
 
 /* This function below will retrieve the data from either a local or remote
  source, process it, then hand off control to the View: */
-Article.fetchAll = function() {
+Article.fetchAll = function(e) {
   if (localStorage.hackerIpsum) {
-    Article.loadAll(JSON.parse(localstorage.hackherIpsum));
-    Article.initNewArticlePage();
-
+    Article.loadAll(JSON.parse(localStorage.hackerIpsum));
+    articleView.renderIndexPage();
     /*when our data is already in localStorage:
     1. we can process and load it,
     2 Then we can render the index page */
@@ -57,6 +56,7 @@ Article.fetchAll = function() {
       Article.loadAll(ipsumData);
       localStorage.setItem('hackerIpsum', JSON.stringify(ipsumData));
       //localStorage.hackerIpsum = JSON.stringify(ipsumData);
+      articleView.renderIndexPage();
     });
 
     /*TODO: otherwise, without our localStorage data, we need to:
@@ -68,13 +68,6 @@ Article.fetchAll = function() {
     3. And then render the index page. */
   }
 };
-
-
-
-
-
-
-
 
 
 /* Great work so far! STRETCH GOAL TIME!? Refactor your fetchAll above, or
