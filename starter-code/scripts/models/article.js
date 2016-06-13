@@ -11,7 +11,7 @@ function Article (opts) {
  to track, that relates to ALL of the Article objects, so it does not belong on
  the prototype, as that would only be relevant to a single instantiated Article.
  */
-
+Article.all = [];
 
 Article.prototype.toHtml = function(scriptTemplateId) {
   var template = Handlebars.compile($(scriptTemplateId).text());
@@ -32,16 +32,42 @@ Article.prototype.toHtml = function(scriptTemplateId) {
 
 /* TODO: Refactor this code into a function for greater control.
     It will take in our data, and process it via the Article constructor: */
-ourLocalData.sort(function(a,b) {
-  return (new Date(b.publishedOn)) - (new Date(a.publishedOn));
-});
-ourLocalData.forEach(function(ele) {
-  articles.push(new Article(ele));
-});
+Article.loadAll = function(dataWePassIn) {
+  dataWePassIn.sort(function(a,b) {
+    return (new Date(b.publishedOn)) - (new Date(a.publishedOn));
+  }).forEach(function(ele) {
+    Article.all.push(new Article(ele));
+  });
+};
 
 /* This function below will retrieve the data from either a local or remote
  source, process it, then hand off control to the View: */
+Article.fetchAll = function() {
+  if (localStorage.hackerIpsum) {
+    Article.loadAll(JSON.parse(localstorage.hackherIpsum));
+    Article.initNewArticlePage();
 
+    /*when our data is already in localStorage:
+    1. we can process and load it,
+    2 Then we can render the index page */
+    //Article.loadAll(//TODO: invoke with our localStorage!);
+    //TODO: now let's render the index page.
+  } else {
+    $.getJSON('data/hackerIpsum.json', function(ipsumData) {
+      Article.loadAll(ipsumData);
+      localStorage.setItem('hackerIpsum', JSON.stringify(ipsumData));
+      //localStorage.hackerIpsum = JSON.stringify(ipsumData);
+    });
+
+    /*TODO: otherwise, without our localStorage data, we need to:
+    -retrieve our json file asynchronously
+      (which jquery method is best for this?).
+    Within this jQuery method, we should:
+    1. load our json data,
+    2. store that same data in localStorage so we can skip the server call next time.
+    3. And then render the index page. */
+  }
+};
 
 
 
